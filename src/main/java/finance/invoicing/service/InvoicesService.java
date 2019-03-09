@@ -22,7 +22,7 @@ import java.util.Optional;
 @Service
 public class InvoicesService {
 
-    private static final int ENTRIES_PER_PAGE = 5;
+    public static final int ENTRIES_PER_PAGE = 5;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

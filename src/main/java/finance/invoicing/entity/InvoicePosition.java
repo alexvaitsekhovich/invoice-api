@@ -48,6 +48,10 @@ public class InvoicePosition {
         return vat;
     }
 
+    public int getId() {
+        return id;
+    }
+
     @JsonIgnore
     public double getTotalNetto() {
         return netto * amount;
@@ -63,4 +67,12 @@ public class InvoicePosition {
         return (netto * amount) * (vat/100);
     }
 
+    public void setData(int id, int invoiceId, String description, int amount, double netto, double vat) {
+        this.id = id;
+        this.invoiceId = invoiceId;
+        this.description = description;
+        this.amount = amount;
+        this.netto = netto;
+        this.vat = vat;
+    }
 }

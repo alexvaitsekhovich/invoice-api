@@ -2,7 +2,6 @@ package finance.invoicing.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Entity for the invoices
@@ -42,9 +41,8 @@ public class Invoice {
         return number;
     }
 
-    public String getDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return date.format(formatter);
+    public LocalDateTime getDate() {
+        return date;
     }
 
     public int getDebtorId() {
@@ -63,34 +61,30 @@ public class Invoice {
         return balance;
     }
 
-    public String getServiceFrom() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return serviceFrom.format(formatter);
+    public LocalDateTime getServiceFrom() {
+        return serviceFrom;
     }
 
-    public String getServiceUntil() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return serviceUntil.format(formatter);
+    public LocalDateTime getServiceUntil() {
+        return serviceUntil;
     }
 
     public int getState() {
         return state;
     }
 
-    public void setData(int id, String number, String date, double netto, double brutto, double balance,
-                   int debtorId, String serviceFrom, String serviceUntil, int state) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public void setData(int id, String number, LocalDateTime date, double netto, double brutto, double balance,
+                   int debtorId, LocalDateTime serviceFrom, LocalDateTime serviceUntil, int state) {
 
         this.id = id;
         this.number = number;
-        this.date =  LocalDateTime.parse(date, formatter);
+        this.date =  date;
         this.netto = netto;
         this.brutto = brutto;
         this.balance = balance;
         this.debtorId = debtorId;
-        this.date =  LocalDateTime.parse(serviceFrom, formatter);
-        this.date =  LocalDateTime.parse(serviceUntil, formatter);
+        this.serviceFrom =  serviceFrom;
+        this.serviceUntil =  serviceUntil;
         this.state = state;
     }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import finance.invoicing.entity.Invoice;
 import finance.invoicing.entity.InvoicePosition;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -15,6 +17,12 @@ public class InvoiceDetailed {
 
     private List<InvoicePosition> positions;
     private Invoice invoice;
+
+    private DateTimeFormatter formatter;
+
+    public InvoiceDetailed() {
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    }
 
     public void setPositions(List<InvoicePosition> positions) {
         this.positions = positions;
@@ -32,12 +40,13 @@ public class InvoiceDetailed {
         return invoice.getDebtorId();
     }
 
-    public String getDate() {
+    public LocalDateTime getDate() {
         return invoice.getDate();
     }
 
     public String getPeriod() {
-        return invoice.getServiceFrom() + " - " + invoice.getServiceUntil();
+        return invoice.getServiceFrom().format(formatter) + " - " +
+                invoice.getServiceUntil().format(formatter);
     }
 
     public double getTotalNetto() {
