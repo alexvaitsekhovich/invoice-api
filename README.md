@@ -24,17 +24,17 @@ In the directory `dev` run:
 Now these endpoints are available:
 
 List all invoices by the debtor id:
-http://localhost:8092/invoicesall/<debtor_id>
+`http://localhost:8092/invoicesall/<debtor_id>`
 
 [here](http://localhost:8092/invoicesall/12)
 
 List all invoices by the debtor id with pagination:
-http://localhost:8092/invoices/<debtor_id>?page=<page>
+`http://localhost:8092/invoices/<debtor_id>?page=<page>`
 
 [here](http://localhost:8092/invoices/12?page=0)
 
 Show all details of the invoice with the list of all positions:
-http://localhost:8092/invoicedetailed/<invoice_id>
+`http://localhost:8092/invoicedetailed/<invoice_id>`
 
 [here](http://localhost:8092/invoicedetailed/1)
 
