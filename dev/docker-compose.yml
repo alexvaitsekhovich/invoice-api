@@ -1,0 +1,21 @@
+version: '2.1'
+services:
+  invoicing-api:
+    image: alexvaitsekhovich/invoicing-api:latest
+    container_name: invoicing-api
+    ports:
+      - 8092:8080
+    depends_on:
+      invoicing-mysql:
+        condition: service_healthy
+  invoicing-mysql:
+    image: mysql:5.7
+    healthcheck:
+      test: mysql --protocol=socket -hlocalhost -uroot -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1'
+    environment:
+      MYSQL_ROOT_PASSWORD : rootpass
+      MYSQL_DATABASE : finance
+    volumes:
+      - ./invoices_init.sql:/docker-entrypoint-initdb.d/dump.sql
+    ports:
+      - "3308:3306"
