@@ -18,6 +18,8 @@ In the directory `dev` run:
 ```shell
     sh start_api.sh 
  ```
+ 
+ If your port 8092 is not free, change the port in the `docker-compose.yml`, line 7
 
 #### Endpoints:
 
