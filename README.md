@@ -40,6 +40,15 @@ Show all details of the invoice with the list of all positions:
 
 [here](http://localhost:8092/invoicedetailed/1)
 
+Prediction for the next month, i.e. after the month of the last invoice:
+`http://localhost:8092/invoiceprediction/<debtor_id>`
+
+[here](http://localhost:8092/invoiceprediction/12)
+
+For the prediction the accumulated values of previous months is used with the formula for the month x:
+
+*A(x) = αM(x) + (1 − α)A(x-1) with α=0.2*
+
 #### How to use own data:
 
 

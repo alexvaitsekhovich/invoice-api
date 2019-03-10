@@ -3,6 +3,8 @@ package finance.invoicing.service;
 import finance.invoicing.entity.Invoice;
 import finance.invoicing.entity.InvoicePosition;
 import finance.invoicing.model.InvoiceDetailed;
+import finance.invoicing.model.InvoicePrediction;
+import finance.invoicing.model.InvoicePredictionPosition;
 import finance.invoicing.repository.InvoicePositionsRepository;
 import finance.invoicing.repository.InvoicesRepository;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,5 +92,51 @@ public class InvoicesService {
         invoiceDetailed.setPositions(invoicePositionList);
 
         return Optional.of(invoiceDetailed);
+    }
+
+    /**
+     * Get the invoice prediction for the next month
+     *
+     * @param debtorId - the debtor id
+     * @return list of invoices
+     */
+    public InvoicePrediction getMonthPrediction(int debtorId) {
+        logger.debug("Get the invoice prediction of the debtor #{} for the next month", debtorId);
+
+        List<Invoice> invoicesList = invoicesRepository.getByDebtorIdOrderByDateAsc(debtorId);
+
+        InvoicePrediction invoicePrediction = calculatePrediction(invoicesList);
+        return invoicePrediction;
+    }
+
+    /**
+     * Calculate invoice prediction for the next month, i.e. the next after the last invoice
+     * @param invoicesList
+     * @return invoice prediction object
+     */
+    private InvoicePrediction calculatePrediction(List<Invoice> invoicesList) {
+        double smooting = 0.2;
+        double predictedNetto = invoicesList.get(0).getNetto();
+        double predictedBrutto = invoicesList.get(0).getBrutto();
+        double predictedBalance = invoicesList.get(0).getBalance();
+
+        // calculate the predicted values with factor 0.2 for the current month
+        // and factor 0.8 for the previous accumulated months
+        for(int ind = 1; ind < invoicesList.size(); ind++){
+            predictedNetto = invoicesList.get(ind).getNetto() * smooting + predictedNetto * (1 - smooting);
+            predictedBrutto = invoicesList.get(ind).getBrutto() * smooting + predictedBrutto * (1 - smooting);
+            predictedBalance = invoicesList.get(ind).getBalance() * smooting + predictedBalance * (1 - smooting);
+        }
+
+        // now build the prediction
+        List<InvoicePredictionPosition> invoicePredictionPositions = new ArrayList<>();
+        InvoicePredictionPosition invoicePredictionPosition =
+                new InvoicePredictionPosition("Classical", predictedNetto, predictedBrutto, predictedBalance);
+        invoicePredictionPositions.add(invoicePredictionPosition);
+
+        // month should be 1 if the last invoice was made in December
+        int nextMonth = Math.max(1, (invoicesList.get(invoicesList.size()-1).getServiceFrom().getMonthValue() + 1) % 13);
+
+        return new InvoicePrediction(nextMonth, invoicePredictionPositions);
     }
 }

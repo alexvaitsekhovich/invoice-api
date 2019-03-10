@@ -2,6 +2,7 @@ package finance.invoicing.api;
 
 import finance.invoicing.entity.Invoice;
 import finance.invoicing.model.InvoiceDetailed;
+import finance.invoicing.model.InvoicePrediction;
 import finance.invoicing.service.InvoicesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,4 +78,22 @@ public class InvoiceController {
         logger.info("Returning the invoice details and positions list");
         return ResponseEntity.ok(invoiceDetailed.get());
     }
+
+    /**
+     * Get the invoice amount prediction for the certain month
+     * @param month
+     * @param debtorId
+     *
+     * @return the prediction about the invoice data
+     */
+    @GetMapping(value = "/invoiceprediction/{debtorId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<InvoicePrediction> getInvoicePrediction(@PathVariable Integer debtorId) {
+        logger.debug("Get the invoice prediction of the debtor #{} for the next month", debtorId);
+
+        InvoicePrediction invoicePrediction = invoicesService.getMonthPrediction(debtorId);
+
+        logger.info("Returning the invoices prediction");
+        return ResponseEntity.ok(invoicePrediction);
+    }
+
 }

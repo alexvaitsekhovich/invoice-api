@@ -29,6 +29,13 @@ public interface InvoicesRepository extends JpaRepository<Invoice, Integer> {
     List<Invoice> getByDebtorIdOrderByDateDesc(int debtorId);
 
     /**
+     * Get the list of invoices of the defined debtor in ascending order
+     *
+     * @return all invoices of this debtor
+     */
+    List<Invoice> getByDebtorIdOrderByDateAsc(int debtorId);
+
+    /**
      * Get the invoice by id
      *
      * @return invoice
