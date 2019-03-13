@@ -45,9 +45,13 @@ Prediction for the next month, i.e. after the month of the last invoice:
 
 [here](http://localhost:8092/invoiceprediction/12)
 
-For the prediction the accumulated values of previous months is used with the formula for the month x:
+For the classical prediction the accumulated values of previous months is used with the formula for the month x:
 
 *A(x) = αM(x) + (1 − α)A(x-1) with α=0.2*
+
+If the corresponding month is available in the previous years, also a seasonal prediction will be calculated, 
+based on the relation of the invoice amount in this month to the average invoice amount of the year. 
+Then the predicted relation for this year will be calculated with the same formula, but higher smoothing value.
 
 #### How to use own data:
 
