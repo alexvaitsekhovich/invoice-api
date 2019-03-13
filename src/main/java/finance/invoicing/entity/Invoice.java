@@ -73,6 +73,14 @@ public class Invoice {
         return state;
     }
 
+    public int getYear(){
+        return serviceFrom.getYear();
+    }
+
+    public int getMonth(){
+        return serviceFrom.getMonthValue();
+    }
+
     public void setData(int id, String number, LocalDateTime date, double netto, double brutto, double balance,
                    int debtorId, LocalDateTime serviceFrom, LocalDateTime serviceUntil, int state) {
 

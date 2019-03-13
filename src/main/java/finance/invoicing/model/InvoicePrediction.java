@@ -1,18 +1,14 @@
 package finance.invoicing.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import finance.invoicing.entity.Invoice;
-import finance.invoicing.entity.InvoicePosition;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
  * Model for the invoice data prediction
  */
 
-@JsonPropertyOrder({ "month", "positions", "period", "debtorId", "totalNetto", "totalBrutto", "totalVatAmount", "positions" })
+@JsonPropertyOrder({ "month", "positions" })
 public class InvoicePrediction {
 
     private List<InvoicePredictionPosition> positions;

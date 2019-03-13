@@ -2,6 +2,9 @@ package finance.invoicing.service;
 
 import finance.invoicing.entity.Invoice;
 import finance.invoicing.entity.InvoicePosition;
+import finance.invoicing.exception.InsufficientDataException;
+import finance.invoicing.exception.NoInvoicesException;
+import finance.invoicing.helper.Statistics;
 import finance.invoicing.model.InvoiceDetailed;
 import finance.invoicing.model.InvoicePrediction;
 import finance.invoicing.model.InvoicePredictionPosition;
@@ -16,7 +19,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.averagingDouble;
 
 /**
  * Service for the invoicing
@@ -46,7 +53,7 @@ public class InvoicesService {
      * @return list of invoices
      */
     public List<Invoice> getInvoicesEntries(int debtorId, int page) {
-        logger.debug("Retrieve the invoices of the debtor #{}, page {}", debtorId, page);
+        logger.info("Retrieve the invoices of the debtor #{}, page {}", debtorId, page);
 
         Pageable pageable = PageRequest.of(page, ENTRIES_PER_PAGE);
 
@@ -62,7 +69,7 @@ public class InvoicesService {
      * @return list of invoices
      */
     public List<Invoice> getAllInvoicesEntries(int debtorId) {
-        logger.debug("Retrieve all invoices of the debtor #{}", debtorId);
+        logger.info("Retrieve all invoices of the debtor #{}", debtorId);
 
         List<Invoice> invoicesList = invoicesRepository.getByDebtorIdOrderByDateDesc(debtorId);
 
@@ -76,7 +83,7 @@ public class InvoicesService {
      * @return detailed invoice
      */
     public Optional<InvoiceDetailed> getInvoiceDetailed(int invoiceId) {
-        logger.debug("Retrieve all positions of the invoice #{} with details of the invoice", invoiceId);
+        logger.info("Retrieve all positions of the invoice #{} with details of the invoice", invoiceId);
 
         Invoice invoice = invoicesRepository.getById(invoiceId);
 
@@ -100,43 +107,91 @@ public class InvoicesService {
      * @param debtorId - the debtor id
      * @return list of invoices
      */
-    public InvoicePrediction getMonthPrediction(int debtorId) {
-        logger.debug("Get the invoice prediction of the debtor #{} for the next month", debtorId);
+    public InvoicePrediction getMonthPrediction(int debtorId) throws NoInvoicesException, InsufficientDataException {
+        logger.info("Get the invoice predictions of the debtor #{} for the next month", debtorId);
 
         List<Invoice> invoicesList = invoicesRepository.getByDebtorIdOrderByDateAsc(debtorId);
 
-        InvoicePrediction invoicePrediction = calculatePrediction(invoicesList);
-        return invoicePrediction;
+        if (invoicesList.isEmpty()) {
+            throw new NoInvoicesException("No invoices found for debtor #" + debtorId);
+        }
+
+        if (invoicesList.size() < 2) {
+            throw new InsufficientDataException("Not enough invoices found for debtor #" + debtorId);
+        }
+
+        // month should be 1 if the last invoice was made in December
+        int nextMonth = Math.max(1, (invoicesList.get(invoicesList.size() - 1).getServiceFrom().getMonthValue() + 1) % 13);
+
+        List<InvoicePredictionPosition> invoicePredictionPositions = new ArrayList<>();
+
+        InvoicePredictionPosition classicalPrediction = calculateClassicalPredictionPosition(invoicesList);
+        invoicePredictionPositions.add(classicalPrediction);
+
+        InvoicePredictionPosition seasonalPrediction = null;
+        // add seasonal prediction only if the month is available in the previous years
+        try {
+            seasonalPrediction = calculateSeasonalPredictionPosition(invoicesList, nextMonth);
+            invoicePredictionPositions.add(seasonalPrediction);
+        }
+        catch (InsufficientDataException e) {
+            logger.info("No invoices found for month {}, cannot calculate seasonal prediction", nextMonth);
+        }
+
+        return new InvoicePrediction(nextMonth, invoicePredictionPositions);
     }
 
     /**
-     * Calculate invoice prediction for the next month, i.e. the next after the last invoice
+     * Calculate invoice prediction for the next month, i.e. the next after the last invoice,
+     * based on classical algorithm ignoring seasonal deviation
+     * declared public for usage in testcase
+     *
      * @param invoicesList
-     * @return invoice prediction object
+     * @return invoice prediction position
      */
-    private InvoicePrediction calculatePrediction(List<Invoice> invoicesList) {
-        double smooting = 0.2;
-        double predictedNetto = invoicesList.get(0).getNetto();
-        double predictedBrutto = invoicesList.get(0).getBrutto();
-        double predictedBalance = invoicesList.get(0).getBalance();
+    public InvoicePredictionPosition calculateClassicalPredictionPosition(List<Invoice> invoicesList) {
+        // calculate the predicted values with factor 0.2 for the current month
+        // and factor 0.8 for the previous accumulated months
+        double predictedNetto = Statistics.calculatePrediction(
+                invoicesList.stream().map(Invoice::getNetto).collect(Collectors.toList()),
+                0.2);
+
+        return new InvoicePredictionPosition("Classical", predictedNetto);
+    }
+
+    /**
+     * Calculate invoice prediction for the next month, i.e. the next after the last invoice,
+     * based on classical algorithm considering seasonal deviation
+     * declared public for usage in testcase
+     *
+     * @param invoicesList
+     * @return invoice prediction position
+     */
+    public InvoicePredictionPosition calculateSeasonalPredictionPosition(List<Invoice> invoicesList, int month) throws InsufficientDataException {
+
+        // retrieve invoice netto for the specified month of every year
+        Map<Integer, Double> monthNettoForMonth = invoicesList.stream().
+                filter(el -> el.getServiceFrom().getMonthValue() == month).
+                collect(Collectors.toMap(Invoice::getYear, Invoice::getNetto));
+
+        if (monthNettoForMonth.isEmpty()) {
+            throw new InsufficientDataException("No invoices found for the month " + month);
+        }
 
         // calculate the predicted values with factor 0.2 for the current month
         // and factor 0.8 for the previous accumulated months
-        for(int ind = 1; ind < invoicesList.size(); ind++){
-            predictedNetto = invoicesList.get(ind).getNetto() * smooting + predictedNetto * (1 - smooting);
-            predictedBrutto = invoicesList.get(ind).getBrutto() * smooting + predictedBrutto * (1 - smooting);
-            predictedBalance = invoicesList.get(ind).getBalance() * smooting + predictedBalance * (1 - smooting);
-        }
+        double predictedNetto = Statistics.calculatePrediction(
+                invoicesList.stream().map(Invoice::getNetto).collect(Collectors.toList()),
+                0.2);
 
-        // now build the prediction
-        List<InvoicePredictionPosition> invoicePredictionPositions = new ArrayList<>();
-        InvoicePredictionPosition invoicePredictionPosition =
-                new InvoicePredictionPosition("Classical", predictedNetto, predictedBrutto, predictedBalance);
-        invoicePredictionPositions.add(invoicePredictionPosition);
+        // calculate avg netto per year, ignore year that have no invoice in the specified month
+        Map<Integer, Double> averageNettoPerYear = invoicesList.stream().
+                filter(el -> monthNettoForMonth.get(el.getServiceFrom().getYear()) != null).
+                collect(Collectors.groupingBy(Invoice::getYear, averagingDouble(Invoice::getNetto)));
 
-        // month should be 1 if the last invoice was made in December
-        int nextMonth = Math.max(1, (invoicesList.get(invoicesList.size()-1).getServiceFrom().getMonthValue() + 1) % 13);
+        double seasonalPrediction = Statistics.calculateSeasonalPrediction(predictedNetto,
+                monthNettoForMonth, averageNettoPerYear);
 
-        return new InvoicePrediction(nextMonth, invoicePredictionPositions);
+        return new InvoicePredictionPosition("Seasonal", seasonalPrediction);
     }
 }
