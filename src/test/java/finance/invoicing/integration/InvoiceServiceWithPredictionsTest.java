@@ -31,9 +31,9 @@ public class InvoiceServiceWithPredictionsTest {
     @Autowired
     InvoicePositionsRepository invoicePositionsRepository;
 
-    InvoicesService invoicesService;
+    private InvoicesService invoicesService;
 
-    DateTimeFormatter formatter;
+    private DateTimeFormatter formatter;
 
     @Before
     public void setUp() {
@@ -59,7 +59,7 @@ public class InvoiceServiceWithPredictionsTest {
         invoiceList.add(i3);
 
         InvoicePredictionPosition classicalPrediction = invoicesService.calculateClassicalPredictionPosition(invoiceList);
-        assertEquals(classicalPrediction.getNetto(), 100, 0);
+        assertEquals(100, classicalPrediction.getNetto(), 0);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class InvoiceServiceWithPredictionsTest {
         invoiceList.add(i3);
 
         InvoicePredictionPosition classicalPrediction = invoicesService.calculateClassicalPredictionPosition(invoiceList);
-        assertEquals(classicalPrediction.getNetto(), 105.6, 0);
+        assertEquals(105.6, classicalPrediction.getNetto(), 0);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class InvoiceServiceWithPredictionsTest {
 
         InvoicePredictionPosition seasonalPrediction = invoicesService.calculateSeasonalPredictionPosition(invoiceList, 1);
 
-        assertEquals(seasonalPrediction.getNetto(), 100.0, 0);
+        assertEquals(100.0, seasonalPrediction.getNetto(), 0);
     }
 
     @Test
@@ -121,7 +121,7 @@ public class InvoiceServiceWithPredictionsTest {
 
         InvoicePredictionPosition seasonalPrediction = invoicesService.calculateSeasonalPredictionPosition(invoiceList, 1);
 
-        assertEquals(seasonalPrediction.getNetto(), 49.93, 0);
+        assertEquals(49.93, seasonalPrediction.getNetto(), 0);
     }
 
     // the needed month is not available in previous years

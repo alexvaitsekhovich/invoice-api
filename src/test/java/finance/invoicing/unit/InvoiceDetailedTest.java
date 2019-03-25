@@ -39,11 +39,11 @@ public class InvoiceDetailedTest {
         invoiceDetailed.setInvoice(invoice);
         invoiceDetailed.setPositions(positionsList);
 
-        assertEquals(invoiceDetailed.getNumber(), "R-1234");
-        assertEquals(invoiceDetailed.getPeriod(), "2018-01-01 00:00:00 - 2018-01-31 00:00:00");
-        assertEquals(invoiceDetailed.getTotalNetto(), 248.2, 0.01);
-        assertEquals(invoiceDetailed.getTotalBrutto(), 285.13, 0.01);
-        assertEquals(invoiceDetailed.getTotalVatAmount(), 36.93, 0.01);
+        assertEquals("R-1234", invoiceDetailed.getNumber());
+        assertEquals("2018-01-01 00:00:00 - 2018-01-31 00:00:00", invoiceDetailed.getPeriod());
+        assertEquals(248.2, invoiceDetailed.getTotalNetto(), 0.01);
+        assertEquals(285.13, invoiceDetailed.getTotalBrutto(), 0.01);
+        assertEquals(36.93, invoiceDetailed.getTotalVatAmount(), 0.01);
     }
 
 

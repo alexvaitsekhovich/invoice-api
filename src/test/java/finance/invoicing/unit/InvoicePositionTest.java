@@ -17,9 +17,9 @@ public class InvoicePositionTest {
         InvoicePosition position = new InvoicePosition();
         position.setData(1, 1, "Position 1", 1, 100, 19);
 
-        assertEquals(position.getTotalNetto(), 100, 0.01);
-        assertEquals(position.getTotalBrutto(), 119, 0.01);
-        assertEquals(position.getTotalVat(), 19, 0.01);
+        assertEquals(100, position.getTotalNetto(), 0.01);
+        assertEquals(119, position.getTotalBrutto(), 0.01);
+        assertEquals(19, position.getTotalVat(), 0.01);
     }
 
     @Test
@@ -28,9 +28,9 @@ public class InvoicePositionTest {
         InvoicePosition position = new InvoicePosition();
         position.setData(1, 1, "Position 2", 6, 24.7, 12.1);
 
-        assertEquals(position.getTotalNetto(), 148.2, 0.01);
-        assertEquals(position.getTotalBrutto(), 166.13, 0.01);
-        assertEquals(position.getTotalVat(), 17.93, 0.01);
+        assertEquals(148.2, position.getTotalNetto(), 0.01);
+        assertEquals(166.13, position.getTotalBrutto(), 0.01);
+        assertEquals(17.93, position.getTotalVat(), 0.01);
     }
 
 }

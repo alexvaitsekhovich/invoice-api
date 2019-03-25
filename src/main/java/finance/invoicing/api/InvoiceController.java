@@ -29,7 +29,7 @@ public class InvoiceController {
 
     /**
      * Get debtor's invoices with pagination
-     * @param debtorId
+     * @param debtorId debtor id
      * @param page - page offset
      *
      * @return the list of invoices
@@ -37,7 +37,7 @@ public class InvoiceController {
     @GetMapping(value = "/invoices/{debtorId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Invoice>> getInvoices(@PathVariable Integer debtorId,
                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-        logger.info("Retrieve the invoices of the debtor #" + debtorId + ", page " + page);
+        logger.info("Retrieve the invoices of the debtor #{}, page {}", debtorId, page);
 
         List<Invoice> invoicesList = invoicesService.getInvoicesEntries(debtorId, page);
 
@@ -47,13 +47,13 @@ public class InvoiceController {
 
     /**
      * Get all debtor's invoices without pagination
-     * @param debtorId
+     * @param debtorId - debtor id
      *
      * @return the list of invoices
      */
     @GetMapping(value = "/invoicesall/{debtorId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Invoice>> getAllInvoices(@PathVariable Integer debtorId) {
-        logger.info("Retrieve all invoices of the debtor #" + debtorId);
+        logger.info("Retrieve all invoices of the debtor #{}", debtorId);
 
         List<Invoice> invoicesList = invoicesService.getAllInvoicesEntries(debtorId);
 
@@ -63,12 +63,12 @@ public class InvoiceController {
 
     /**
      * Get all invoice positions and all details of the invoice
-     * @param invoiceId
+     * @param invoiceId - debtor id
      * @return the detailed invoice
      */
     @GetMapping(value = "/invoicedetailed/{invoiceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InvoiceDetailed> getInvoiceDetailed(@PathVariable Integer invoiceId) {
-        logger.info("Retrieve all positions and details of the invoice #" + invoiceId);
+        logger.info("Retrieve all positions and details of the invoice #{}", invoiceId);
 
         Optional<InvoiceDetailed> invoiceDetailed = invoicesService.getInvoiceDetailed(invoiceId);
 
@@ -83,7 +83,7 @@ public class InvoiceController {
 
     /**
      * Get the invoice amount prediction for the certain month
-     * @param debtorId
+     * @param debtorId - debtor id
      *
      * @return the prediction about the invoice data
      */
@@ -91,7 +91,8 @@ public class InvoiceController {
     public ResponseEntity<InvoicePrediction> getInvoicePrediction(@PathVariable Integer debtorId) {
         logger.info("Get the invoice prediction of the debtor #{} for the next month", debtorId);
 
-        InvoicePrediction invoicePrediction = null;
+        InvoicePrediction invoicePrediction;
+
         try {
             invoicePrediction = invoicesService.getMonthPrediction(debtorId);
         }

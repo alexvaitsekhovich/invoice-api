@@ -30,9 +30,9 @@ public class InvoiceServiceTest {
     @Autowired
     InvoicePositionsRepository invoicePositionsRepository;
 
-    InvoicesService invoicesService;
+    private InvoicesService invoicesService;
 
-    DateTimeFormatter formatter;
+    private DateTimeFormatter formatter;
 
     /**
      * Create invoices for testing
@@ -90,28 +90,28 @@ public class InvoiceServiceTest {
     public void testDetailedInvoice() {
 
         InvoiceDetailed invoiceDetailed = invoicesService.getInvoiceDetailed(1).get();
-        assertEquals(invoiceDetailed.getDebtorId(), 11);
-        assertEquals(invoiceDetailed.getDate(), LocalDateTime.parse("2018-02-01 00:00:00", formatter));
-        assertEquals(invoiceDetailed.getNumber(), "R-1234");
-        assertEquals(invoiceDetailed.getTotalNetto(), 700, 0);
-        assertEquals(invoiceDetailed.getTotalBrutto(), 761, 0);
-        assertEquals(invoiceDetailed.getTotalVatAmount(), 61, 0);
+        assertEquals(11, invoiceDetailed.getDebtorId());
+        assertEquals(LocalDateTime.parse("2018-02-01 00:00:00", formatter), invoiceDetailed.getDate());
+        assertEquals("R-1234", invoiceDetailed.getNumber());
+        assertEquals(700, invoiceDetailed.getTotalNetto(), 0);
+        assertEquals(761, invoiceDetailed.getTotalBrutto(), 0);
+        assertEquals(61, invoiceDetailed.getTotalVatAmount(), 0);
 
         List<InvoicePosition> invoicePositions = invoiceDetailed.getPositions();
         for (InvoicePosition p: invoicePositions) {
-            assertEquals(p.getInvoiceId(), 1);
+            assertEquals(1, p.getInvoiceId());
 
             if (p.getId() == 1) {
-                assertEquals(p.getDescription(), "Position 1");
-                assertEquals(p.getAmount(), 1);
-                assertEquals(p.getNetto(), 100, 0);
-                assertEquals(p.getVat(), 19, 0);
+                assertEquals("Position 1", p.getDescription());
+                assertEquals(1, p.getAmount());
+                assertEquals(100, p.getNetto(), 0);
+                assertEquals(19, p.getVat(), 0);
             }
             else if (p.getId() == 2) {
-                assertEquals(p.getDescription(), "Position 2");
-                assertEquals(p.getAmount(), 3);
-                assertEquals(p.getNetto(), 200, 0);
-                assertEquals(p.getVat(), 7, 0);
+                assertEquals("Position 2", p.getDescription());
+                assertEquals(3, p.getAmount());
+                assertEquals(200, p.getNetto(), 0);
+                assertEquals(7, p.getVat(), 0);
             }
         }
     }
@@ -123,29 +123,29 @@ public class InvoiceServiceTest {
     public void testListInvoices() {
 
         List<Invoice> invoices = invoicesService.getAllInvoicesEntries(11);
-        assertEquals(invoices.size(), 6);
+        assertEquals(6, invoices.size());
 
         for (Invoice i: invoices) {
-            assertEquals(i.getDebtorId(), 11);
-            assertEquals(i.getBalance(), 0, 0);
+            assertEquals(11, i.getDebtorId());
+            assertEquals(0, i.getBalance(), 0);
 
             if (i.getId() == 1) {
-                assertEquals(i.getNumber(), "R-1234");
-                assertEquals(i.getDate(), LocalDateTime.parse("2018-02-01 00:00:00", formatter));
-                assertEquals(i.getNetto(), 100, 0);
-                assertEquals(i.getBrutto(), 119, 0);
-                assertEquals(i.getServiceFrom(), LocalDateTime.parse("2018-01-01 00:00:00", formatter));
-                assertEquals(i.getServiceUntil(), LocalDateTime.parse("2018-01-31 00:00:00", formatter));
-                assertEquals(i.getState(), 1);
+                assertEquals("R-1234", i.getNumber());
+                assertEquals(LocalDateTime.parse("2018-02-01 00:00:00", formatter), i.getDate());
+                assertEquals(100, i.getNetto(), 0);
+                assertEquals(119, i.getBrutto(), 0);
+                assertEquals(LocalDateTime.parse("2018-01-01 00:00:00", formatter), i.getServiceFrom());
+                assertEquals(LocalDateTime.parse("2018-01-31 00:00:00", formatter), i.getServiceUntil());
+                assertEquals(1, i.getState());
             }
             else if (i.getId() == 2)  {
-                assertEquals(i.getNumber(), "R-5678");
-                assertEquals(i.getDate(), LocalDateTime.parse("2019-03-01 00:00:00", formatter));
-                assertEquals(i.getNetto(), 200, 0);
-                assertEquals(i.getBrutto(), 238, 0);
-                assertEquals(i.getServiceFrom(), LocalDateTime.parse("2019-03-01 00:00:00", formatter));
-                assertEquals(i.getServiceUntil(), LocalDateTime.parse("2019-03-31 00:00:00", formatter));
-                assertEquals(i.getState(), 0);
+                assertEquals("R-5678", i.getNumber());
+                assertEquals(LocalDateTime.parse("2019-03-01 00:00:00", formatter), i.getDate());
+                assertEquals(200, i.getNetto(), 0);
+                assertEquals(238, i.getBrutto(), 0);
+                assertEquals(LocalDateTime.parse("2019-03-01 00:00:00", formatter), i.getServiceFrom());
+                assertEquals(LocalDateTime.parse("2019-03-31 00:00:00", formatter), i.getServiceUntil());
+                assertEquals(0, i.getState());
             }
         }
     }
@@ -157,7 +157,7 @@ public class InvoiceServiceTest {
     public void testListInvoicesPage0() {
 
         List<Invoice> invoices = invoicesService.getInvoicesEntries(11, 0);
-        assertEquals(invoices.size(), InvoicesService.ENTRIES_PER_PAGE);
+        assertEquals(InvoicesService.ENTRIES_PER_PAGE, invoices.size());
     }
 
     /**
@@ -167,7 +167,7 @@ public class InvoiceServiceTest {
     public void testListInvoicesPage1() {
 
         List<Invoice> invoices = invoicesService.getInvoicesEntries(11, 1);
-        assertEquals(invoices.size(), 1);
+        assertEquals(1, invoices.size());
     }
 }
 

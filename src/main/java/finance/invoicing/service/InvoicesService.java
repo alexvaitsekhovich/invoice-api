@@ -57,9 +57,7 @@ public class InvoicesService {
 
         Pageable pageable = PageRequest.of(page, ENTRIES_PER_PAGE);
 
-        List<Invoice> invoicesList = invoicesRepository.getByDebtorIdOrderByDateDesc(debtorId, pageable);
-
-        return invoicesList;
+        return invoicesRepository.getByDebtorIdOrderByDateDesc(debtorId, pageable);
     }
 
     /**
@@ -71,15 +69,13 @@ public class InvoicesService {
     public List<Invoice> getAllInvoicesEntries(int debtorId) {
         logger.info("Retrieve all invoices of the debtor #{}", debtorId);
 
-        List<Invoice> invoicesList = invoicesRepository.getByDebtorIdOrderByDateDesc(debtorId);
-
-        return invoicesList;
+        return invoicesRepository.getByDebtorIdOrderByDateDesc(debtorId);
     }
 
     /**
      * Get all positions of this invoice with the invoice details
      *
-     * @param invoiceId
+     * @param invoiceId - invoice id
      * @return detailed invoice
      */
     public Optional<InvoiceDetailed> getInvoiceDetailed(int invoiceId) {
@@ -128,7 +124,8 @@ public class InvoicesService {
         InvoicePredictionPosition classicalPrediction = calculateClassicalPredictionPosition(invoicesList);
         invoicePredictionPositions.add(classicalPrediction);
 
-        InvoicePredictionPosition seasonalPrediction = null;
+        InvoicePredictionPosition seasonalPrediction;
+
         // add seasonal prediction only if the month is available in the previous years
         try {
             seasonalPrediction = calculateSeasonalPredictionPosition(invoicesList, nextMonth);
@@ -146,7 +143,7 @@ public class InvoicesService {
      * based on classical algorithm ignoring seasonal deviation
      * declared public for usage in testcase
      *
-     * @param invoicesList
+     * @param invoicesList - invoice id
      * @return invoice prediction position
      */
     public InvoicePredictionPosition calculateClassicalPredictionPosition(List<Invoice> invoicesList) {
@@ -164,7 +161,7 @@ public class InvoicesService {
      * based on classical algorithm considering seasonal deviation
      * declared public for usage in testcase
      *
-     * @param invoicesList
+     * @param invoicesList - invoice id
      * @return invoice prediction position
      */
     public InvoicePredictionPosition calculateSeasonalPredictionPosition(List<Invoice> invoicesList, int month) throws InsufficientDataException {

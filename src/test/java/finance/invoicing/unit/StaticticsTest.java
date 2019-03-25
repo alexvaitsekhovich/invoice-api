@@ -26,7 +26,7 @@ public class StaticticsTest {
 
         double prediction = Statistics.calculatePrediction(data, 1.0);
 
-        assertEquals(prediction, 100.0, 0);
+        assertEquals(100.0, prediction, 0);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class StaticticsTest {
 
         double prediction = Statistics.calculatePrediction(data, 0.2);
 
-        assertEquals(prediction, 100.0, 0);
+        assertEquals(100.0, prediction, 0);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class StaticticsTest {
 
         double prediction = Statistics.calculatePrediction(data, 1.0);
 
-        assertEquals(prediction, 130.0, 0);
+        assertEquals(130.0, prediction, 0);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class StaticticsTest {
 
         double prediction = Statistics.calculatePrediction(data, 0.2);
 
-        assertEquals(prediction, 110.48, 0.01);
+        assertEquals(110.48, prediction, 0.01);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class StaticticsTest {
         double seasonalPrediction = Statistics.calculateSeasonalPrediction(nonSeasonalPrediction,
                 monthValues, avgValues);
 
-        assertEquals(seasonalPrediction, 50.0, 0.01);
+        assertEquals(50.0, seasonalPrediction, 0.01);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class StaticticsTest {
         double seasonalPrediction = Statistics.calculateSeasonalPrediction(nonSeasonalPrediction,
                 monthValues, avgValues);
 
-        assertEquals(seasonalPrediction, 60.62, 0.01);
+        assertEquals(60.62, seasonalPrediction, 0.01);
     }
 
     @Test
@@ -128,6 +128,6 @@ public class StaticticsTest {
         double seasonalPrediction = Statistics.calculateSeasonalPrediction(nonSeasonalPrediction,
                 monthValues, avgValues);
 
-        assertEquals(seasonalPrediction, 75.0, 0.01);
+        assertEquals(75.0, seasonalPrediction, 0.01);
     }
 }

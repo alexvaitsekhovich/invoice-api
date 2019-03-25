@@ -37,14 +37,14 @@ public class InvoiceControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    InvoicesService invoicesService;
+    private InvoicesService invoicesService;
 
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     @Autowired
     MappingJackson2HttpMessageConverter builder;
 
-    DateTimeFormatter formatter;
+    private DateTimeFormatter formatter;
 
     @Before
     public void setup() {
@@ -74,8 +74,8 @@ public class InvoiceControllerTest {
                 andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         List<Invoice> result = mapper.readValue(response, new TypeReference<List<Invoice>>() {});
 
-        assertEquals(result.size(), 1);
-        assertEquals(result.get(0).getId(), invoice.getId());
+        assertEquals(1, result.size());
+        assertEquals(invoice.getId(), result.get(0).getId());
     }
 
     /**
@@ -119,7 +119,7 @@ public class InvoiceControllerTest {
                 andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         List<Invoice> result = mapper.readValue(response, new TypeReference<List<Invoice>>() {});
 
-        assertEquals(result.size(), InvoicesService.ENTRIES_PER_PAGE);
+        assertEquals(InvoicesService.ENTRIES_PER_PAGE, result.size());
     }
 }
 
